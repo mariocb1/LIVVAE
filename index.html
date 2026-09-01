@@ -10,7 +10,7 @@
 
   <script>
     // ==== IDENTIFICADORES DE LIVVAE (app white-label sobre Virtuagym/Digifit) ====
-    const IOS_SCHEME = "virtuagym://";                    // Sin confirmar: prueba en un iPhone real con la app instalada.
+    const APP_SCHEME = "virtuagym://";                    // Confirmado en iOS. Se usa también para Android.
     const IOS_APP_STORE_URL = "https://apps.apple.com/es/app/livvae/id6760459143"; // Confirmado
     const ANDROID_PACKAGE = "digifit.android.virtuagym.pro.entrenate"; // Confirmado (Google Play)
     const ANDROID_PLAY_URL = "https://play.google.com/store/apps/details?id=" + ANDROID_PACKAGE;
@@ -41,12 +41,14 @@
 
     if (isIOS) {
       goToStoreIfStillHere(IOS_APP_STORE_URL, 1500);
-      window.location.href = IOS_SCHEME;
+      window.location.href = APP_SCHEME;
     } else if (isAndroid) {
-      // El intent:// ya incluye browser_fallback_url, así que Android gestiona
-      // por sí solo el salto a Play Store si la app no está instalada.
+      // 1) Intentamos abrir la app vía intent:// con scheme explícito (más fiable que el formato anterior)
+      // 2) Si no responde en 1.5s (no instalada / no soportado), saltamos al Play Store
+      goToStoreIfStillHere(ANDROID_PLAY_URL, 1500);
+
       const androidIntent =
-        "intent://#Intent;package=" + ANDROID_PACKAGE +
+        "intent://open#Intent;scheme=virtuagym;package=" + ANDROID_PACKAGE +
         ";S.browser_fallback_url=" + encodeURIComponent(ANDROID_PLAY_URL) +
         ";end;";
       window.location.href = androidIntent;
