@@ -9,19 +9,19 @@
   <p id="msg">Abriendo Livvae...</p>
 
   <script>
-    // ==== IDENTIFICADORES DE LIVVAE (app white-label sobre Virtuagym/Digifit) ====
-    const APP_SCHEME = "virtuagym://";                    // Confirmado en iOS. Se usa también para Android.
-    const IOS_APP_STORE_URL = "https://apps.apple.com/es/app/livvae/id6760459143"; // Confirmado
-    const ANDROID_PACKAGE = "digifit.android.virtuagym.pro.entrenate"; // Confirmado (Google Play)
+    // ==== IDENTIFICADORES DE LIVVAE ====
+    const APP_SCHEME = "virtuagym://";
+    const IOS_APP_STORE_URL = "https://apps.apple.com/es/app/livvae/id6760459143";
+    const ANDROID_PACKAGE = "digifit.android.virtuagym.pro.entrenate";
     const ANDROID_PLAY_URL = "https://play.google.com/store/apps/details?id=" + ANDROID_PACKAGE;
-    // ==============================================================================
+    const WEB_DESKTOP_URL = "https://livvae.com/"; // Web oficial para ordenadores
+    // ====================================
 
     const ua = navigator.userAgent || navigator.vendor || window.opera;
     const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
     const isAndroid = /android/i.test(ua);
 
     function goToStoreIfStillHere(storeUrl, delay) {
-      // Si el navegador pierde el foco (la app se abrió), cancelamos el fallback
       let redirected = false;
       const timer = setTimeout(function () {
         if (!redirected) {
@@ -43,18 +43,16 @@
       goToStoreIfStillHere(IOS_APP_STORE_URL, 1500);
       window.location.href = APP_SCHEME;
     } else if (isAndroid) {
-      // 1) Intentamos abrir la app vía intent:// con scheme explícito (más fiable que el formato anterior)
-      // 2) Si no responde en 1.5s (no instalada / no soportado), saltamos al Play Store
-      goToStoreIfStillHere(ANDROID_PLAY_URL, 1500);
-
+      // Abre la app directamente por su paquete. Si no existe, va al Play Store
       const androidIntent =
-        "intent://open#Intent;scheme=virtuagym;package=" + ANDROID_PACKAGE +
+        "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=" +
+        ANDROID_PACKAGE +
         ";S.browser_fallback_url=" + encodeURIComponent(ANDROID_PLAY_URL) +
         ";end;";
       window.location.href = androidIntent;
     } else {
-      // Escritorio u otro dispositivo: mándalo a una landing o a Play Store
-      window.location.replace(ANDROID_PLAY_URL);
+      // Si se abre desde un PC / Escritorio
+      window.location.replace(WEB_DESKTOP_URL);
     }
   </script>
 </body>
