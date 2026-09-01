@@ -11,94 +11,73 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 85vh;
+      min-height: 80vh;
       margin: 0;
       padding: 20px;
       text-align: center;
-      background-color: #f8f9fa;
-    }
-    .card {
-      background: #ffffff;
-      padding: 30px 20px;
-      border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      max-width: 320px;
-      width: 100%;
-    }
-    h2 {
-      margin: 0 0 10px;
-      font-size: 22px;
-      color: #111;
-    }
-    p {
-      color: #666;
-      font-size: 14px;
-      margin: 0 0 20px;
+      background-color: #ffffff;
     }
     .btn {
-      display: block;
-      background-color: #007aff;
+      display: inline-block;
+      background-color: #01875f;
       color: #ffffff;
-      padding: 14px 0;
+      padding: 14px 28px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: bold;
       text-decoration: none;
-      border-radius: 10px;
-      margin-bottom: 12px;
-    }
-    .btn-secondary {
-      background-color: #e5e5ea;
-      color: #333333;
+      border-radius: 8px;
+      margin-top: 20px;
     }
   </style>
+  <script>
+    window.onload = function() {
+      // 1. Identificadores y enlaces
+      var packageName = "digifit.android.virtuagym.pro.entrenate";
+      var iosStoreUrl = "https://apps.apple.com/es/app/livvae/id6760459143";
+      var playStoreUrl = "https://play.google.com/store/apps/details?id=" + packageName;
+      var webDesktopUrl = "https://livvae.com/";
+
+      // 2. Detección de dispositivo
+      var ua = navigator.userAgent || navigator.vendor || window.opera;
+      var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+      var isAndroid = /android/i.test(ua);
+
+      if (isAndroid) {
+        // Intent URI con acción MAIN / LAUNCHER y fallback directo a Google Play
+        var intentUrl = "intent:#Intent;" +
+                        "action=android.intent.action.MAIN;" +
+                        "category=android.intent.category.LAUNCHER;" +
+                        "package=" + packageName + ";" +
+                        "S.browser_fallback_url=" + encodeURIComponent(playStoreUrl) + ";" +
+                        "end";
+        
+        document.getElementById("action-btn").href = intentUrl;
+        document.getElementById("action-btn").innerText = "Abrir Livvae";
+        window.location.replace(intentUrl);
+
+      } else if (isIOS) {
+        document.getElementById("action-btn").href = "virtuagym://";
+        document.getElementById("action-btn").innerText = "Abrir Livvae";
+        window.location.replace("virtuagym://");
+
+        setTimeout(function() {
+          if (!document.hidden) {
+            window.location.replace(iosStoreUrl);
+          }
+        }, 1500); // 1500 milisegundos de margen
+
+      } else {
+        // Escritorio / PC
+        window.location.replace(webDesktopUrl);
+      }
+    };
+  </script>
 </head>
 <body>
-  <div class="card">
-    <h2>Abriendo Livvae...</h2>
-    <p>Si la aplicación no se abre automáticamente en 2 segundos, pulsa aquí:</p>
-    
-    <a id="btnAbrir" class="btn" href="#">Abrir App</a>
-    <a id="btnDescargar" class="btn btn-secondary" href="#">Descargar en la Tienda</a>
-  </div>
-
-  <script>
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
-    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-    const isAndroid = /android/i.test(ua);
-
-    // Identificadores de Livvae
-    const ANDROID_PKG = "digifit.android.virtuagym.pro.entrenate";
-    const PLAY_STORE = "https://play.google.com/store/apps/details?id=" + ANDROID_PKG;
-    const IOS_STORE = "https://apps.apple.com/es/app/livvae/id6760459143";
-    const WEB_DESKTOP = "https://livvae.com/";
-
-    // Protocolo directo sin bloqueo de seguridad
-    const INTENT_ANDROID = "intent://#Intent;scheme=virtuagym;package=" + ANDROID_PKG + ";end;";
-    const SCHEME_IOS = "virtuagym://";
-
-    const btnAbrir = document.getElementById("btnAbrir");
-    const btnDescargar = document.getElementById("btnDescargar");
-
-    if (isAndroid) {
-      btnAbrir.href = INTENT_ANDROID;
-      btnDescargar.href = PLAY_STORE;
-
-      // Lanzamiento automático
-      window.location.href = INTENT_ANDROID;
-    } else if (isIOS) {
-      btnAbrir.href = SCHEME_IOS;
-      btnDescargar.href = IOS_STORE;
-
-      // Lanzamiento automático en iOS
-      window.location.href = SCHEME_IOS;
-      setTimeout(function() {
-        if (!document.hidden) {
-          window.location.replace(IOS_STORE);
-        }
-      }, 2000);
-    } else {
-      window.location.replace(WEB_DESKTOP);
-    }
-  </script>
+  <h2>Abriendo Livvae...</h2>
+  <p>Si la aplicación no se abre automáticamente en 2 segundos, pulsa el botón:</p>
+  <a id="action-btn" class="btn" href="https://play.google.com/store/apps/details?id=digifit.android.virtuagym.pro.entrenate">
+    Abrir aplicación
+  </a>
 </body>
 </html>
