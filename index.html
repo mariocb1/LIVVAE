@@ -4,28 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Livvae</title>
-  <script>
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
-
-    // Enlace de App Store para iPhone
-    const appStoreUrl = "https://apps.apple.com/es/app/livvae/id6760459143";
-
-    // Intent de Android: abre la app directamente o salta a Google Play si no existe
-    const androidIntent = "intent://#Intent;package=digifit.android.virtuagym.pro.entrenate;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Ddigifit.android.virtuagym.pro.entrenate;end;";
-
-    if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
-      window.location.href = "virtuagym://";
-      setTimeout(function() {
-        window.location.replace(appStoreUrl);
-      }, 1500);
-    } else if (/android/i.test(ua)) {
-      window.location.href = androidIntent;
-    } else {
-      window.location.replace("https://play.google.com/store/apps/details?id=digifit.android.virtuagym.pro.entrenate");
-    }
-  </script>
 </head>
 <body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
-  <p>Abriendo Livvae...</p>
+  <p id="msg">Abriendo Livvae...</p>
+
+  <script>
+    // ==== IDENTIFICADORES DE LIVVAE (app white-label sobre Virtuagym/Digifit) ====
+    const IOS_SCHEME = "virtuagym://";                    // Sin confirmar: prueba en un iPhone real con la app instalada.
+    const IOS_APP_STORE_URL = "https://apps.apple.com/es/app/livvae/id6760459143"; // Confirmado
+    const ANDROID_PACKAGE = "digifit.android.virtuagym.pro.entrenate"; // Confirmado (Google Play)
+    const ANDROID_PLAY_URL = "https://play.google.com/store/apps/details?id=" + ANDROID_PACKAGE;
+    // ==============================================================================
+
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isAndroid = /android/i.test(ua);
+
+    function goToStoreIfStillHere(storeUrl, delay) {
+      // Si el navegador pierde el foco (la app se abrió), cancelamos el fallback
+      let redirected = false;
+      const timer = setTimeout(function () {
+        if (!redirected) {
+          window.location.replace(storeUrl);
+        }
+      }, delay);
+
+      function onHide() {
+        if (document.hidden) {
+          redirected = true;
+          clearTimeout(timer);
+        }
+      }
+      document.addEventListener("visibilitychange", onHide);
+      window.addEventListener("pagehide", onHide);
+    }
+
+    if (isIOS) {
+      goToStoreIfStillHere(IOS_APP_STORE_URL, 1500);
+      window.location.href = IOS_SCHEME;
+    } else if (isAndroid) {
+      // El intent:// ya incluye browser_fallback_url, así que Android gestiona
+      // por sí solo el salto a Play Store si la app no está instalada.
+      const androidIntent =
+        "intent://#Intent;package=" + ANDROID_PACKAGE +
+        ";S.browser_fallback_url=" + encodeURIComponent(ANDROID_PLAY_URL) +
+        ";end;";
+      window.location.href = androidIntent;
+    } else {
+      // Escritorio u otro dispositivo: mándalo a una landing o a Play Store
+      window.location.replace(ANDROID_PLAY_URL);
+    }
+  </script>
 </body>
 </html>
