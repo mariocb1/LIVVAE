@@ -4,55 +4,74 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Livvae</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      background-color: #ffffff;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #000000;
+      color: #ffffff;
+      padding: 16px 36px;
+      font-size: 18px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 10px;
+      margin-top: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
-  <p id="msg">Abriendo Livvae...</p>
+<body>
+  <h2>Abriendo Livvae...</h2>
+  <p>Si no se abre automáticamente en 2 segundos, pulsa el botón:</p>
+  
+  <a id="btnApp" class="btn" href="#">Abrir Livvae</a>
 
   <script>
-    // ==== IDENTIFICADORES DE LIVVAE ====
+    // Configuración de identificadores
     const APP_SCHEME = "virtuagym://";
-    const IOS_APP_STORE_URL = "https://apps.apple.com/es/app/livvae/id6760459143";
-    const ANDROID_PACKAGE = "digifit.android.virtuagym.pro.entrenate";
-    const ANDROID_PLAY_URL = "https://play.google.com/store/apps/details?id=" + ANDROID_PACKAGE;
-    const WEB_DESKTOP_URL = "https://livvae.com/"; // Web oficial para ordenadores
-    // ====================================
+    const IOS_STORE = "https://apps.apple.com/es/app/livvae/id6760459143";
+    const ANDROID_PKG = "digifit.android.virtuagym.pro.entrenate";
+    const PLAY_STORE = "https://play.google.com/store/apps/details?id=" + ANDROID_PKG;
+    const WEB_URL = "https://livvae.com/";
 
     const ua = navigator.userAgent || navigator.vendor || window.opera;
     const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
     const isAndroid = /android/i.test(ua);
+    const boton = document.getElementById("btnApp");
 
-    function goToStoreIfStillHere(storeUrl, delay) {
-      let redirected = false;
-      const timer = setTimeout(function () {
-        if (!redirected) {
-          window.location.replace(storeUrl);
-        }
-      }, delay);
-
-      function onHide() {
-        if (document.hidden) {
-          redirected = true;
-          clearTimeout(timer);
-        }
-      }
-      document.addEventListener("visibilitychange", onHide);
-      window.addEventListener("pagehide", onHide);
-    }
-
-    if (isIOS) {
-      goToStoreIfStillHere(IOS_APP_STORE_URL, 1500);
-      window.location.href = APP_SCHEME;
-    } else if (isAndroid) {
-      // Abre la app directamente por su paquete. Si no existe, va al Play Store
-      const androidIntent =
-        "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=" +
-        ANDROID_PACKAGE +
-        ";S.browser_fallback_url=" + encodeURIComponent(ANDROID_PLAY_URL) +
-        ";end;";
+    if (isAndroid) {
+      const androidIntent = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=" + ANDROID_PKG + ";S.browser_fallback_url=" + encodeURIComponent(PLAY_STORE) + ";end;";
+      boton.href = androidIntent;
+      // Intento automático en segundo plano
       window.location.href = androidIntent;
+    } else if (isIOS) {
+      boton.href = APP_SCHEME;
+      boton.onclick = function() {
+        setTimeout(function() {
+          window.location.href = IOS_STORE;
+        }, 1500);
+      };
+      // Intento automático en iOS
+      window.location.href = APP_SCHEME;
+      setTimeout(function() {
+        if (!document.hidden) {
+          window.location.replace(IOS_STORE);
+        }
+      }, 1500);
     } else {
-      // Si se abre desde un PC / Escritorio
-      window.location.replace(WEB_DESKTOP_URL);
+      boton.href = WEB_URL;
+      window.location.replace(WEB_URL);
     }
   </script>
 </body>
